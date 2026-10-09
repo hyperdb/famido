@@ -12,6 +12,11 @@ GitHubの特定Issueを確認し、自動でブランチ作成・コード実装
 4. 承認後、コードを実装し、ローカルで動作検証を行ってください。ただし、UI実装を伴う場合にはスクリーンショットを撮り、ユーザーの承認を得てください。
 5. 実装が完了したら変更をコミットし、対応するIssueを自動でクローズしてください。
 
+## Additional explanation
+
+- `git commit`の際に `-m "Fix issue #[番号]: [コミットメッセージ]"` のように、Issue番号をコミットメッセージに含めるようにしてください。
+- ユーザーのcommitと識別するために`--author`オプションで`Gemini Agent <gemini-agent@antigravity.local>`を指定してください。
+
 ## Requirements
 
 - GitHubリポジトリへのプッシュ権限
