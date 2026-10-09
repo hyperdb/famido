@@ -1,18 +1,38 @@
-import React, { useState } from 'react';
-import { X, FolderPlus, Check } from 'lucide-react';
-import { ThemeType } from '../types';
+import React, { useState, useEffect } from 'react';
+import { X, FolderPlus, Settings, Check } from 'lucide-react';
+import { Project, ThemeType } from '../types';
 
 interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (title: string, description: string, theme: ThemeType) => Promise<void>;
+  onSubmit: (title: string, description: string, theme: ThemeType) => Promise<void>;
+  initialProject?: Project | null;
 }
 
-export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onCreate }) => {
+export const ProjectModal: React.FC<ProjectModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  initialProject,
+}) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [theme, setTheme] = useState<ThemeType>('indigo');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isEditMode = Boolean(initialProject);
+
+  useEffect(() => {
+    if (initialProject) {
+      setTitle(initialProject.title || '');
+      setDescription(initialProject.description || '');
+      setTheme(initialProject.theme || 'indigo');
+    } else {
+      setTitle('');
+      setDescription('');
+      setTheme('indigo');
+    }
+  }, [initialProject, isOpen]);
 
   if (!isOpen) return null;
 
@@ -22,14 +42,11 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onC
 
     try {
       setIsSubmitting(true);
-      await onCreate(title.trim(), description.trim(), theme);
-      setTitle('');
-      setDescription('');
-      setTheme('indigo');
+      await onSubmit(title.trim(), description.trim(), theme);
       onClose();
     } catch (err) {
       console.error(err);
-      alert('プロジェクトの作成に失敗しました');
+      alert(isEditMode ? 'プロジェクトの更新に失敗しました' : 'プロジェクトの作成に失敗しました');
     } finally {
       setIsSubmitting(false);
     }
@@ -40,7 +57,15 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onC
       <div className="theme-card w-full max-w-md rounded-2xl p-6 shadow-2xl border theme-border transition-all animate-in fade-in zoom-in-95 duration-150">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold flex items-center gap-2">
-            <FolderPlus className="w-5 h-5 text-indigo-500" /> 新規プロジェクト作成
+            {isEditMode ? (
+              <>
+                <Settings className="w-5 h-5 text-indigo-500" /> プロジェクト設定・編集
+              </>
+            ) : (
+              <>
+                <FolderPlus className="w-5 h-5 text-indigo-500" /> 新規プロジェクト作成
+              </>
+            )}
           </h3>
           <button
             onClick={onClose}
@@ -119,7 +144,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onC
               disabled={isSubmitting}
               className="theme-primary-btn text-white px-5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition disabled:opacity-50"
             >
-              <Check className="w-4 h-4" /> 作成して開く
+              <Check className="w-4 h-4" /> {isEditMode ? '変更を保存' : '作成して開く'}
             </button>
           </div>
         </form>

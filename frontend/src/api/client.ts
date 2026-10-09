@@ -28,6 +28,23 @@ export const api = {
     return res.json();
   },
 
+  // プロジェクト情報更新（タイトル、説明、テーマ）
+  async updateProject(
+    projectId: string,
+    params: { title?: string; description?: string; theme?: ThemeType }
+  ): Promise<{ success: boolean; project?: Project }> {
+    const res = await fetch(`${API_BASE}/projects/${projectId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to update project');
+    }
+    return res.json();
+  },
+
   // プロジェクトテーマ更新
   async updateProjectTheme(projectId: string, theme: ThemeType): Promise<{ success: boolean }> {
     const res = await fetch(`${API_BASE}/projects/${projectId}/theme`, {

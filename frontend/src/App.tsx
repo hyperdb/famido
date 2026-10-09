@@ -6,7 +6,7 @@ import { FilterBar } from './components/FilterBar';
 import { Timeline } from './components/Timeline';
 import { ProjectModal } from './components/ProjectModal';
 import { MemberModal } from './components/MemberModal';
-import { User } from './types';
+import { User, Project } from './types';
 
 export const App: React.FC = () => {
   const {
@@ -35,11 +35,13 @@ export const App: React.FC = () => {
     deleteTask,
     addTask,
     createProject,
+    updateProject,
     addMember,
     updateMember,
   } = useTimelineTodo();
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<User | null>(null);
 
@@ -53,6 +55,16 @@ export const App: React.FC = () => {
   const handleOpenAddMember = () => {
     setEditingMember(null);
     setIsMemberModalOpen(true);
+  };
+
+  const handleOpenNewProject = () => {
+    setEditingProject(null);
+    setIsProjectModalOpen(true);
+  };
+
+  const handleOpenEditProject = (project: Project) => {
+    setEditingProject(project);
+    setIsProjectModalOpen(true);
   };
 
   return (
@@ -69,7 +81,8 @@ export const App: React.FC = () => {
           totalTasksCount={allTasks.length}
           completedTasksCount={completedCount}
           onSwitchProject={switchProject}
-          onOpenNewProjectModal={() => setIsProjectModalOpen(true)}
+          onOpenNewProjectModal={handleOpenNewProject}
+          onOpenEditProjectModal={handleOpenEditProject}
           onOpenAddMemberModal={handleOpenAddMember}
           onOpenEditMemberModal={handleOpenEditMember}
           onChangeCurrentUser={changeCurrentUser}
@@ -102,11 +115,21 @@ export const App: React.FC = () => {
           onDelete={deleteTask}
         />
 
-        {/* 新規プロジェクト作成モーダル */}
+        {/* プロジェクト作成・編集モーダル */}
         <ProjectModal
           isOpen={isProjectModalOpen}
-          onClose={() => setIsProjectModalOpen(false)}
-          onCreate={createProject}
+          initialProject={editingProject}
+          onClose={() => {
+            setIsProjectModalOpen(false);
+            setEditingProject(null);
+          }}
+          onSubmit={async (title, description, theme) => {
+            if (editingProject) {
+              await updateProject(editingProject.id, { title, description, theme });
+            } else {
+              await createProject(title, description, theme);
+            }
+          }}
         />
 
         {/* メンバー追加・編集モーダル */}

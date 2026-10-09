@@ -256,6 +256,17 @@ export function useTimelineTodo() {
     switchProject(res.projectId);
   };
 
+  // プロジェクト編集
+  const updateProject = async (projectId: string, params: { title: string; description: string; theme: ThemeType }) => {
+    await api.updateProject(projectId, params);
+    showToast(`プロジェクト「${params.title}」の情報を更新しました`);
+    if (params.theme && params.theme !== currentTheme) {
+      applyTheme(params.theme);
+    }
+    await loadProjects();
+    await loadProjectData(projectId);
+  };
+
   // メンバー追加
   const addMember = async (params: { name: string; role: string; avatarColor: string }) => {
     await api.addMember(currentProjectId, params);
@@ -313,6 +324,7 @@ export function useTimelineTodo() {
     deleteTask,
     addTask,
     createProject,
+    updateProject,
     addMember,
     updateMember,
   };

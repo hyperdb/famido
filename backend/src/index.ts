@@ -77,6 +77,44 @@ app.post('/api/projects', async (c) => {
   return c.json({ success: true, projectId }, 201);
 });
 
+// プロジェクト情報更新（タイトル、説明、テーマ）
+app.patch('/api/projects/:id', async (c) => {
+  const projectId = c.req.param('id');
+  const body = await c.req.json<{
+    title?: string;
+    description?: string;
+    theme?: string;
+  }>();
+
+  if (body.title !== undefined && body.title.trim() === '') {
+    return c.json({ error: 'Title cannot be empty' }, 400);
+  }
+
+  const current = await c.env.DB.prepare(`SELECT * FROM projects WHERE id = ?`).bind(projectId).first<{
+    id: string;
+    title: string;
+    description: string;
+    theme: string;
+  }>();
+
+  if (!current) {
+    return c.json({ error: 'Project not found' }, 404);
+  }
+
+  const newTitle = body.title !== undefined ? body.title.trim() : current.title;
+  const newDescription = body.description !== undefined ? body.description.trim() : current.description;
+  const newTheme = body.theme !== undefined ? body.theme : current.theme;
+
+  await c.env.DB.prepare(`
+    UPDATE projects 
+    SET title = ?, description = ?, theme = ?, updated_at = CURRENT_TIMESTAMP 
+    WHERE id = ?
+  `).bind(newTitle, newDescription, newTheme, projectId).run();
+
+  const updated = await c.env.DB.prepare(`SELECT * FROM projects WHERE id = ?`).bind(projectId).first();
+  return c.json({ success: true, project: updated });
+});
+
 // プロジェクトのテーマ設定を更新
 app.patch('/api/projects/:id/theme', async (c) => {
   const projectId = c.req.param('id');

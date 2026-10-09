@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Plus, Palette, Moon, User as UserIcon, FolderOpen, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, Plus, Palette, Moon, User as UserIcon, FolderOpen, CheckCircle2, Edit2 } from 'lucide-react';
 import { Project, User, ThemeType } from '../types';
 
 interface HeaderProps {
@@ -13,6 +13,7 @@ interface HeaderProps {
   completedTasksCount: number;
   onSwitchProject: (projectId: string) => void;
   onOpenNewProjectModal: () => void;
+  onOpenEditProjectModal: (project: Project) => void;
   onOpenAddMemberModal: () => void;
   onOpenEditMemberModal: (user: User) => void;
   onChangeCurrentUser: (userId: string) => void;
@@ -30,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   completedTasksCount,
   onSwitchProject,
   onOpenNewProjectModal,
+  onOpenEditProjectModal,
   onOpenAddMemberModal,
   onOpenEditMemberModal,
   onChangeCurrentUser,
@@ -61,17 +63,28 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="theme-primary-badge px-2.5 py-0.5 rounded-full text-xs font-semibold border">
               プロジェクト
             </span>
-            <button
-              onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
-              className="flex items-center gap-2 text-2xl font-bold hover:opacity-85 transition group text-left px-2 py-1 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60"
-            >
-              <span>{currentProject?.title || '読み込み中...'}</span>
-              <ChevronDown
-                className={`w-5 h-5 opacity-50 group-hover:opacity-100 transition-transform duration-200 ${
-                  isProjectDropdownOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
+                className="flex items-center gap-2 text-2xl font-bold hover:opacity-85 transition group text-left px-2 py-1 -ml-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60"
+              >
+                <span>{currentProject?.title || '読み込み中...'}</span>
+                <ChevronDown
+                  className={`w-5 h-5 opacity-50 group-hover:opacity-100 transition-transform duration-200 ${
+                    isProjectDropdownOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {currentProject && (
+                <button
+                  onClick={() => onOpenEditProjectModal(currentProject)}
+                  className="p-1.5 rounded-xl opacity-60 hover:opacity-100 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition text-slate-600 dark:text-slate-300"
+                  title="プロジェクト名を編集"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-3 mt-1.5 text-xs">
@@ -145,7 +158,18 @@ export const Header: React.FC<HeaderProps> = ({
                 })}
               </div>
 
-              <div className="pt-2 border-t theme-border mt-1">
+              <div className="pt-2 border-t theme-border mt-1 space-y-1">
+                {currentProject && (
+                  <button
+                    onClick={() => {
+                      setIsProjectDropdownOpen(false);
+                      onOpenEditProjectModal(currentProject);
+                    }}
+                    className="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold flex items-center gap-2 theme-muted-text hover:text-slate-900 dark:hover:text-slate-100 transition"
+                  >
+                    <Edit2 className="w-4 h-4" /> プロジェクト設定・編集...
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setIsProjectDropdownOpen(false);
