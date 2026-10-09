@@ -1,0 +1,11 @@
+name = "timeline-todo-api"
+main = "src/index.ts"
+compatibility_date = "2024-04-01"
+compatibility_flags = [ "nodejs_compat" ]
+
+# Cloudflare D1 データベース設定
+[[d1_databases]]
+binding = "DB"
+database_name = "timeline-todo-db"
+database_id = "local-timeline-todo-db" # 本番デプロイ時に wrangler d1 create で発行されたIDに差し替え
+migrations_dir = "src/db"
