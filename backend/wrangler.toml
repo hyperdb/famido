@@ -1,4 +1,4 @@
-name = "timeline-todo-api"
+name = "famido-api"
 main = "src/index.ts"
 compatibility_date = "2024-04-01"
 compatibility_flags = [ "nodejs_compat" ]
@@ -6,6 +6,6 @@ compatibility_flags = [ "nodejs_compat" ]
 # Cloudflare D1 データベース設定
 [[d1_databases]]
 binding = "DB"
-database_name = "timeline-todo-db"
-database_id = "local-timeline-todo-db" # 本番デプロイ時に wrangler d1 create で発行されたIDに差し替え
+database_name = "famido-db"
+database_id = "e790aba4-360f-40b7-b8e5-7f58e3b3e901"
 migrations_dir = "src/db"

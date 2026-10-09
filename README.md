@@ -1,8 +1,12 @@
-# Timeline Todo (タイムライン・ToDo)
+# famido (ファミド)
 
 > **完了したタスクが消えない、実績とこれからの予定がひと目でわかるプロジェクト＆タスク管理アプリ**
 
 Todoistのような軽快な操作感を持ちながら、「完了したタスクをリストから消さず、アクション履歴として色・スタイルを変えて常に参照できる」ことをコンセプトにしたWebアプリケーションです。
+
+- **公開URL (本番)**: [https://famido.hyperdb.workers.dev](https://famido.hyperdb.workers.dev)
+- **API URL**: [https://famido-api.hyperdb.workers.dev](https://famido-api.hyperdb.workers.dev)
+- **GitHub**: [https://github.com/hyperdb/famido](https://github.com/hyperdb/famido)
 
 ---
 
@@ -29,7 +33,7 @@ Todoistのような軽快な操作感を持ちながら、「完了したタス�
 
 - **フロントエンド**: React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons
 - **バックエンド**: Cloudflare Workers, Hono, Cloudflare D1 (SQLite)
-- **インフラ**: Cloudflare Workers / Cloudflare Pages
+- **インフラ**: Cloudflare Workers (Static Assets) / D1
 
 ---
 
@@ -46,8 +50,8 @@ cd backend
 npm install
 
 # ローカル D1 データベースの初期化とシードデータの投入
-npx wrangler d1 execute timeline-todo-db --local --file=./src/db/schema.sql
-npx wrangler d1 execute timeline-todo-db --local --file=./src/db/seed.sql
+npx wrangler d1 execute famido-db --local --file=./src/db/schema.sql
+npx wrangler d1 execute famido-db --local --file=./src/db/seed.sql
 
 # 開発サーバー起動 (デフォルト: http://127.0.0.1:8787)
 npm run dev
@@ -73,27 +77,28 @@ npm run dev
 
 ```bash
 cd backend
-npx wrangler d1 create timeline-todo-db
+npx wrangler d1 create famido-db
 # 出力された database_id を wrangler.toml に反映
-npx wrangler d1 execute timeline-todo-db --remote --file=./src/db/schema.sql
-npx wrangler d1 execute timeline-todo-db --remote --file=./src/db/seed.sql
+npx wrangler d1 execute famido-db --remote --file=./src/db/schema.sql
+npx wrangler d1 execute famido-db --remote --file=./src/db/seed.sql
 ```
 
 ### 2. バックエンド API のデプロイ
 
 ```bash
+cd backend
 npx wrangler deploy
-# 発行された Workers URL を確認 (例: https://timeline-todo-api.<your-subdomain>.workers.dev)
+# 発行された Workers URL: https://famido-api.hyperdb.workers.dev
 ```
 
-### 3. フロントエンドのデプロイ (Cloudflare Pages)
+### 3. フロントエンドのデプロイ (Workers Assets)
 
 ```bash
-cd ../frontend
-# .env.production に本番 Workers API URL を指定
-echo "VITE_API_URL=https://<your-workers-url>/api" > .env.production
+cd frontend
+# 本番ビルド＆デプロイ
 npm run build
-npx wrangler pages deploy dist --project-name=timeline-todo
+npx wrangler deploy
+# 発行された公開URL: https://famido.hyperdb.workers.dev
 ```
 
 ---
